@@ -18,4 +18,4 @@
   * 4個AXI Master
   * 4個AXI Slave
   * 可支援FIXED、INCR和WRAP模式
-  * 完成One2One testbench
+  * 功能覆蓋率完成One2One testbench
