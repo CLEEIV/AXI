@@ -1,0 +1,392 @@
+module Top (
+    //----- Global -----//
+    input  ACLK   ,
+    input  ARESETn,
+    //----- Control signals -----//
+    input         write_en     ,
+    input         read_en      ,
+    input  [31:0] awaddr_ctrl  ,
+    input  [7:0]  awlen_ctrl   ,
+    input  [2:0]  awsize_ctrl  ,
+    input  [1:0]  awburst_ctrl ,
+    input  [31:0] araddr_ctrl  ,
+    input  [7:0]  arlen_ctrl   ,
+    input  [2:0]  arsize_ctrl  ,
+    input  [1:0]  arburst_ctrl ,
+    //----- Data output -----//
+    output [31:0] data_o    
+);
+//----- Master 0 -----//
+wire [3:0]  M0_AWID   ;
+wire [31:0] M0_AWADDR ;
+wire [7:0]  M0_AWLEN  ;
+wire [2:0]  M0_AWSIZE ;
+wire [1:0]  M0_AWBURST;
+wire        M0_AWVALID;
+wire        M0_AWREADY;
+wire [32:0] M0_WDATA  ;
+wire [3:0]  M0_WSTRB  ;
+wire        M0_WLAST  ;
+wire        M0_WVALID ;
+wire        M0_WREADY ;
+wire [3:0]  M0_BID    ;
+wire [1:0]  M0_BRESP  ;
+wire        M0_BVALID ;
+wire        M0_BREADY ;
+wire [3:0]  M0_ARID   ;
+wire [31:0] M0_ARADDR ;
+wire [7:0]  M0_ARLEN  ;
+wire [2:0]  M0_ARSIZE ;
+wire [1:0]  M0_ARBURST;
+wire        M0_ARVALID;
+wire        M0_ARREADY;
+wire [3:0]  M0_RID    ;
+wire [31:0] M0_RDATA  ;
+wire [1:0]  M0_RRESP  ;
+wire        M0_RLAST  ;
+wire        M0_RVALID ;
+wire        M0_RREADY ;
+//----- Slave 0 -----//
+wire [3:0]  S0_AWID   ;
+wire [31:0] S0_AWADDR ;
+wire [7:0]  S0_AWLEN  ;
+wire [2:0]  S0_AWSIZE ;
+wire [1:0]  S0_AWBURST;
+wire        S0_AWVALID;
+wire        S0_AWREADY;
+wire [32:0] S0_WDATA  ;
+wire [3:0]  S0_WSTRB  ;
+wire        S0_WLAST  ;
+wire        S0_WVALID ;
+wire        S0_WREADY ;
+wire [3:0]  S0_BID    ;
+wire [1:0]  S0_BRESP  ;
+wire        S0_BVALID ;
+wire        S0_BREADY ;
+wire [3:0]  S0_ARID   ;
+wire [31:0] S0_ARADDR ;
+wire [7:0]  S0_ARLEN  ;
+wire [2:0]  S0_ARSIZE ;
+wire [1:0]  S0_ARBURST;
+wire        S0_ARVALID;
+wire        S0_ARREADY;
+wire [3:0]  S0_RID    ;
+wire [31:0] S0_RDATA  ;
+wire [1:0]  S0_RRESP  ;
+wire        S0_RLAST  ;
+wire        S0_RVALID ;
+wire        S0_RREADY ;
+// Pin assign
+Master Master_0 (
+    .m_aclk        ( ACLK         ),
+    .m_aresetn     ( ARESETn      ),
+    .m_axi_awid    ( M0_AWID      ),
+    .m_axi_awaddr  ( M0_AWADDR    ),
+    .m_axi_awlen   ( M0_AWLEN     ),
+    .m_axi_awsize  ( M0_AWSIZE    ),
+    .m_axi_awburst ( M0_AWBURST   ),
+    .m_axi_awvalid ( M0_AWVALID   ),
+    .m_axi_awready ( M0_AWREADY   ),
+    .m_axi_wdata   ( M0_WDATA     ),
+    .m_axi_wstrb   ( M0_WSTRB     ),
+    .m_axi_wlast   ( M0_WLAST     ),
+    .m_axi_wvalid  ( M0_WVALID    ),
+    .m_axi_wready  ( M0_WREADY    ),
+    .m_axi_bid     ( M0_BID       ),
+    .m_axi_bresp   ( M0_BRESP     ),
+    .m_axi_bvalid  ( M0_BVALID    ),
+    .m_axi_bready  ( M0_BREADY    ),
+    .m_axi_arid    ( M0_ARID      ),
+    .m_axi_araddr  ( M0_ARADDR    ),
+    .m_axi_arlen   ( M0_ARLEN     ),
+    .m_axi_arsize  ( M0_ARSIZE    ),
+    .m_axi_arburst ( M0_ARBURST   ),
+    .m_axi_arvalid ( M0_ARVALID   ),
+    .m_axi_arready ( M0_ARREADY   ),
+    .m_axi_rid     ( M0_RID       ),
+    .m_axi_rdata   ( M0_RDATA     ),
+    .m_axi_rresp   ( M0_RRESP     ),
+    .m_axi_rlast   ( M0_RLAST     ),
+    .m_axi_rvalid  ( M0_RVALID    ),
+    .m_axi_rready  ( M0_RREADY    ),
+    .write_en      ( write_en     ),
+    .read_en       ( read_en      ),
+    .awaddr_ctrl   ( awaddr_ctrl  ),
+    .awlen_ctrl    ( awlen_ctrl   ),
+    .awsize_ctrl   ( awsize_ctrl  ),
+    .awburst_ctrl  ( awburst_ctrl ),
+    .araddr_ctrl   ( araddr_ctrl  ),
+    .arlen_ctrl    ( arlen_ctrl   ),
+    .arsize_ctrl   ( arsize_ctrl  ),
+    .arburst_ctrl  ( arburst_ctrl ),
+    .data_o        ( data_o_r     ) 
+);
+Interconnect Interconnect (
+    .ACLK           ( ACLK       ),
+    .ARESETn        ( ARESETn    ),
+    .m0_axi_awid    ( M0_AWID    ),
+    .m0_axi_awaddr  ( M0_AWADDR  ),
+    .m0_axi_awlen   ( M0_AWLEN   ),
+    .m0_axi_awsize  ( M0_AWSIZE  ),
+    .m0_axi_awburst ( M0_AWBURST ),
+    .m0_axi_awvalid ( M0_AWVALID ),
+    .m0_axi_awready ( M0_AWREADY ),
+    .m0_axi_wdata   ( M0_WDATA   ),
+    .m0_axi_wstrb   ( M0_WSTRB   ),
+    .m0_axi_wlast   ( M0_WLAST   ),
+    .m0_axi_wvalid  ( M0_WVALID  ),
+    .m0_axi_wready  ( M0_WREADY  ),
+    .m0_axi_bid     ( M0_BID     ),
+    .m0_axi_bresp   ( M0_BRESP   ),
+    .m0_axi_bvalid  ( M0_BVALID  ),
+    .m0_axi_bready  ( M0_BREADY  ),
+    .m0_axi_arid    ( M0_ARID    ),
+    .m0_axi_araddr  ( M0_ARADDR  ),
+    .m0_axi_arlen   ( M0_ARLEN   ),
+    .m0_axi_arsize  ( M0_ARSIZE  ),
+    .m0_axi_arburst ( M0_ARBURST ),
+    .m0_axi_arvalid ( M0_ARVALID ),
+    .m0_axi_arready ( M0_ARREADY ),
+    .m0_axi_rid     ( M0_RID     ),
+    .m0_axi_rdata   ( M0_RDATA   ),
+    .m0_axi_rresp   ( M0_RRESP   ),
+    .m0_axi_rlast   ( M0_RLAST   ),
+    .m0_axi_rvalid  ( M0_RVALID  ),
+    .m0_axi_rready  ( M0_RREADY  ),
+    .m1_axi_awid    (  ),
+    .m1_axi_awaddr  (  ),
+    .m1_axi_awlen   (  ),
+    .m1_axi_awsize  (  ),
+    .m1_axi_awburst (  ),
+    .m1_axi_awvalid (  ),
+    .m1_axi_awready (  ),
+    .m1_axi_wdata   (  ),
+    .m1_axi_wstrb   (  ),
+    .m1_axi_wlast   (  ),
+    .m1_axi_wvalid  (  ),
+    .m1_axi_wready  (  ),
+    .m1_axi_bid     (  ),
+    .m1_axi_bresp   (  ),
+    .m1_axi_bvalid  (  ),
+    .m1_axi_bready  (  ),
+    .m1_axi_arid    (  ),
+    .m1_axi_araddr  (  ),
+    .m1_axi_arlen   (  ),
+    .m1_axi_arsize  (  ),
+    .m1_axi_arburst (  ),
+    .m1_axi_arvalid (  ),
+    .m1_axi_arready (  ),
+    .m1_axi_rid     (  ),
+    .m1_axi_rdata   (  ),
+    .m1_axi_rresp   (  ),
+    .m1_axi_rlast   (  ),
+    .m1_axi_rvalid  (  ),
+    .m1_axi_rready  (  ),
+    .m2_axi_awid    (  ),
+    .m2_axi_awaddr  (  ),
+    .m2_axi_awlen   (  ),
+    .m2_axi_awsize  (  ),
+    .m2_axi_awburst (  ),
+    .m2_axi_awvalid (  ),
+    .m2_axi_awready (  ),
+    .m2_axi_wdata   (  ),
+    .m2_axi_wstrb   (  ),
+    .m2_axi_wlast   (  ),
+    .m2_axi_wvalid  (  ),
+    .m2_axi_wready  (  ),
+    .m2_axi_bid     (  ),
+    .m2_axi_bresp   (  ),
+    .m2_axi_bvalid  (  ),
+    .m2_axi_bready  (  ),
+    .m2_axi_arid    (  ),
+    .m2_axi_araddr  (  ),
+    .m2_axi_arlen   (  ),
+    .m2_axi_arsize  (  ),
+    .m2_axi_arburst (  ),
+    .m2_axi_arvalid (  ),
+    .m2_axi_arready (  ),
+    .m2_axi_rid     (  ),
+    .m2_axi_rdata   (  ),
+    .m2_axi_rresp   (  ),
+    .m2_axi_rlast   (  ),
+    .m2_axi_rvalid  (  ),
+    .m2_axi_rready  (  ),
+    .m3_axi_awid    (  ),
+    .m3_axi_awaddr  (  ),
+    .m3_axi_awlen   (  ),
+    .m3_axi_awsize  (  ),
+    .m3_axi_awburst (  ),
+    .m3_axi_awvalid (  ),
+    .m3_axi_awready (  ),
+    .m3_axi_wdata   (  ),
+    .m3_axi_wstrb   (  ),
+    .m3_axi_wlast   (  ),
+    .m3_axi_wvalid  (  ),
+    .m3_axi_wready  (  ),
+    .m3_axi_bid     (  ),
+    .m3_axi_bresp   (  ),
+    .m3_axi_bvalid  (  ),
+    .m3_axi_bready  (  ),
+    .m3_axi_arid    (  ),
+    .m3_axi_araddr  (  ),
+    .m3_axi_arlen   (  ),
+    .m3_axi_arsize  (  ),
+    .m3_axi_arburst (  ),
+    .m3_axi_arvalid (  ),
+    .m3_axi_arready (  ),
+    .m3_axi_rid     (  ),
+    .m3_axi_rdata   (  ),
+    .m3_axi_rresp   (  ),
+    .m3_axi_rlast   (  ),
+    .m3_axi_rvalid  (  ),
+    .m3_axi_rready  (  ),
+    .s0_axi_awid    ( S0_AWID    ),
+    .s0_axi_awaddr  ( S0_AWADDR  ),
+    .s0_axi_awlen   ( S0_AWLEN   ),
+    .s0_axi_awsize  ( S0_AWSIZE  ),
+    .s0_axi_awburst ( S0_AWBURST ),
+    .s0_axi_awvalid ( S0_AWVALID ),
+    .s0_axi_awready ( S0_AWREADY ),
+    .s0_axi_wdata   ( S0_WDATA   ),
+    .s0_axi_wstrb   ( S0_WSTRB   ),
+    .s0_axi_wlast   ( S0_WLAST   ),
+    .s0_axi_wvalid  ( S0_WVALID  ),
+    .s0_axi_wready  ( S0_WREADY  ),
+    .s0_axi_bid     ( S0_BID     ),
+    .s0_axi_bresp   ( S0_BRESP   ),
+    .s0_axi_bvalid  ( S0_BVALID  ),
+    .s0_axi_bready  ( S0_BREADY  ),
+    .s0_axi_arid    ( S0_ARID    ),
+    .s0_axi_araddr  ( S0_ARADDR  ),
+    .s0_axi_arlen   ( S0_ARLEN   ),
+    .s0_axi_arsize  ( S0_ARSIZE  ),
+    .s0_axi_arburst ( S0_ARBURST ),
+    .s0_axi_arvalid ( S0_ARVALID ),
+    .s0_axi_arready ( S0_ARREADY ),
+    .s0_axi_rid     ( S0_RID     ),
+    .s0_axi_rdata   ( S0_RDATA   ),
+    .s0_axi_rresp   ( S0_RRESP   ),
+    .s0_axi_rlast   ( S0_RLAST   ),
+    .s0_axi_rvalid  ( S0_RVALID  ),
+    .s0_axi_rready  ( S0_RREADY  ),
+    .s1_axi_awid    (  ),
+    .s1_axi_awaddr  (  ),
+    .s1_axi_awlen   (  ),
+    .s1_axi_awsize  (  ),
+    .s1_axi_awburst (  ),
+    .s1_axi_awvalid (  ),
+    .s1_axi_awready (  ),
+    .s1_axi_wdata   (  ),
+    .s1_axi_wstrb   (  ),
+    .s1_axi_wlast   (  ),
+    .s1_axi_wvalid  (  ),
+    .s1_axi_wready  (  ),
+    .s1_axi_bid     (  ),
+    .s1_axi_bresp   (  ),
+    .s1_axi_bvalid  (  ),
+    .s1_axi_bready  (  ),
+    .s1_axi_arid    (  ),
+    .s1_axi_araddr  (  ),
+    .s1_axi_arlen   (  ),
+    .s1_axi_arsize  (  ),
+    .s1_axi_arburst (  ),
+    .s1_axi_arvalid (  ),
+    .s1_axi_arready (  ),
+    .s1_axi_rid     (  ),
+    .s1_axi_rdata   (  ),
+    .s1_axi_rresp   (  ),
+    .s1_axi_rlast   (  ),
+    .s1_axi_rvalid  (  ),
+    .s1_axi_rready  (  ),
+    .s2_axi_awid    (  ),
+    .s2_axi_awaddr  (  ),
+    .s2_axi_awlen   (  ),
+    .s2_axi_awsize  (  ),
+    .s2_axi_awburst (  ),
+    .s2_axi_awvalid (  ),
+    .s2_axi_awready (  ),
+    .s2_axi_wdata   (  ),
+    .s2_axi_wstrb   (  ),
+    .s2_axi_wlast   (  ),
+    .s2_axi_wvalid  (  ),
+    .s2_axi_wready  (  ),
+    .s2_axi_bid     (  ),
+    .s2_axi_bresp   (  ),
+    .s2_axi_bvalid  (  ),
+    .s2_axi_bready  (  ),
+    .s2_axi_arid    (  ),
+    .s2_axi_araddr  (  ),
+    .s2_axi_arlen   (  ),
+    .s2_axi_arsize  (  ),
+    .s2_axi_arburst (  ),
+    .s2_axi_arvalid (  ),
+    .s2_axi_arready (  ),
+    .s2_axi_rid     (  ),
+    .s2_axi_rdata   (  ),
+    .s2_axi_rresp   (  ),
+    .s2_axi_rlast   (  ),
+    .s2_axi_rvalid  (  ),
+    .s2_axi_rready  (  ),
+    .s3_axi_awid    (  ),
+    .s3_axi_awaddr  (  ),
+    .s3_axi_awlen   (  ),
+    .s3_axi_awsize  (  ),
+    .s3_axi_awburst (  ),
+    .s3_axi_awvalid (  ),
+    .s3_axi_awready (  ),
+    .s3_axi_wdata   (  ),
+    .s3_axi_wstrb   (  ),
+    .s3_axi_wlast   (  ),
+    .s3_axi_wvalid  (  ),
+    .s3_axi_wready  (  ),
+    .s3_axi_bid     (  ),
+    .s3_axi_bresp   (  ),
+    .s3_axi_bvalid  (  ),
+    .s3_axi_bready  (  ),
+    .s3_axi_arid    (  ),
+    .s3_axi_araddr  (  ),
+    .s3_axi_arlen   (  ),
+    .s3_axi_arsize  (  ),
+    .s3_axi_arburst (  ),
+    .s3_axi_arvalid (  ),
+    .s3_axi_rid     (  ),
+    .s3_axi_rdata   (  ),
+    .s3_axi_rresp   (  ),
+    .s3_axi_rlast   (  ),
+    .s3_axi_rvalid  (  ),
+    .s3_axi_rready  (  ) 
+);
+Slave Slave_0 (
+    .s_aclk        ( ACLK       ),
+    .s_aresetn     ( ARESETn    ),
+    .s_axi_awid    ( S0_AWID    ),
+    .s_axi_awaddr  ( S0_AWADDR  ),
+    .s_axi_awlen   ( S0_AWLEN   ),
+    .s_axi_awsize  ( S0_AWSIZE  ),
+    .s_axi_awburst ( S0_AWBURST ),
+    .s_axi_awvalid ( S0_AWVALID ),
+    .s_axi_awready ( S0_AWREADY ),
+    .s_axi_wdata   ( S0_WDATA   ),
+    .s_axi_wstrb   ( S0_WSTRB   ),
+    .s_axi_wlast   ( S0_WLAST   ),
+    .s_axi_wvalid  ( S0_WVALID  ),
+    .s_axi_wready  ( S0_WREADY  ),
+    .s_axi_bid     ( S0_BID     ),
+    .s_axi_bresp   ( S0_BRESP   ),
+    .s_axi_bvalid  ( S0_BVALID  ),
+    .s_axi_bready  ( S0_BREADY  ),
+    .s_axi_arid    ( S0_ARID    ),
+    .s_axi_araddr  ( S0_ARADDR  ),
+    .s_axi_arlen   ( S0_ARLEN   ),
+    .s_axi_arsize  ( S0_ARSIZE  ),
+    .s_axi_arburst ( S0_ARBURST ),
+    .s_axi_arvalid ( S0_ARVALID ),
+    .s_axi_arready ( S0_ARREADY ),
+    .s_axi_rid     ( S0_RID     ),
+    .s_axi_rdata   ( S0_RDATA   ),
+    .s_axi_rresp   ( S0_RRESP   ),
+    .s_axi_rlast   ( S0_RLAST   ),
+    .s_axi_rvalid  ( S0_RVALID  ),
+    .s_axi_rready  ( S0_RREADY  )   
+);
+endmodule
