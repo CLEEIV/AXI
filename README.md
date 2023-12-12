@@ -15,7 +15,7 @@
 
 ##### 筆記
 * 2023.10.23
-  * 4個AXI Master
+  * 1個AXI Master
   * 4個AXI Slave
   * 可支援FIXED、INCR和WRAP模式
-  * 功能覆蓋率完成One2One testbench
+  * 功能覆蓋率完成One2four testbench
